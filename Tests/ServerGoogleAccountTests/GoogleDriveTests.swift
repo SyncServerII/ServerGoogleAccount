@@ -919,7 +919,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     // I recently repaired an issue with a bad GoogleCredsConfiguration. I want to make sure it doesn't occur again.
-    func testBadGoogleCredsConfiguration() {
+    func testBadGoogleCredsConfigurationFails() {
         let badConfig = GooglePlist(refreshToken: "unused", GoogleServerClientId: "foo", GoogleServerClientSecret: "bar")
         
         guard let creds = GoogleCreds(configuration: badConfig) else {
