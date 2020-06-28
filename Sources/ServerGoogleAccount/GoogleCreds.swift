@@ -366,8 +366,8 @@ public class GoogleCreds : AccountAPICall, Account {
         var headers:[String:String] = additionalHeaders ?? [:]
         
         // We use this for some cases where we don't have an accessToken
-        if self.accessToken != nil {
-            headers["Authorization"] = "Bearer \(self.accessToken!)"
+        if let accessToken = self.accessToken {
+            headers["Authorization"] = "Bearer \(accessToken)"
         }
 
         super.apiCall(method: method, baseURL: baseURL, path: path, additionalHeaders: headers, additionalOptions: additionalOptions, urlParameters: urlParameters, body: body,
@@ -432,7 +432,9 @@ public class GoogleCreds : AccountAPICall, Account {
                         Log.info("Successfully refreshed access token!")
 
                         // Refresh was successful, update the authorization header and try the operation again.
-                        headers["Authorization"] = "Bearer \(self.accessToken!)"
+                        if let accessToken = self.accessToken {
+                            headers["Authorization"] = "Bearer \(accessToken)"
+                        }
                         
                         super.apiCall(method: method, baseURL: baseURL, path: path, additionalHeaders: headers, additionalOptions: additionalOptions, urlParameters: urlParameters, body: body, returnResultWhenNon200Code: returnResultWhenNon200Code, expectedSuccessBody: expectedSuccessBody, expectedFailureBody: expectedFailureBody, completion: completion)
                     }

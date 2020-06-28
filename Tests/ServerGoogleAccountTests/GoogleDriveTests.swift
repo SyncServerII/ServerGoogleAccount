@@ -16,8 +16,8 @@ import ServerAccount
 
 struct GooglePlist: Decodable, GoogleCredsConfiguration {
     let refreshToken: String
-    var GoogleServerClientId: String?
-    var GoogleServerClientSecret: String?
+    let GoogleServerClientId: String?
+    let GoogleServerClientSecret: String?
     
     static func load(from url: URL) -> Self {
         guard let data = try? Data(contentsOf: url) else {
@@ -915,6 +915,26 @@ class GoogleDriveTests: XCTestCase {
             exp.fulfill()
         }
         
+        waitForExpectations(timeout: 10, handler: nil)
+    }
+    
+    // I recently repaired an issue with a bad GoogleCredsConfiguration. I want to make sure it doesn't occur again.
+    func testBadGoogleCredsConfiguration() {
+        let badConfig = GooglePlist(refreshToken: "unused", GoogleServerClientId: "foo", GoogleServerClientSecret: "bar")
+        
+        guard let creds = GoogleCreds(configuration: badConfig) else {
+            XCTFail()
+            return
+        }
+        
+        creds.refreshToken = plist.refreshToken
+        let exp = expectation(description: "\(#function)\(#line)")
+        
+        creds.refresh { error in
+            XCTAssert(error != nil)
+            exp.fulfill()
+        }
+
         waitForExpectations(timeout: 10, handler: nil)
     }
 }
