@@ -11,8 +11,7 @@ let package = Package(
             targets: ["ServerGoogleAccount"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/SyncServerII/ServerAccount.git", .branch("master")),
-
+        .package(url: "https://github.com/SyncServerII/ServerAccount.git", from: "0.0.2"),
     ],
     targets: [
         .target(
