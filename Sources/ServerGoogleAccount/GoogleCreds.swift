@@ -69,7 +69,7 @@ public class GoogleCreds : AccountAPICall, Account {
         return GoogleCreds.accountScheme
     }
 
-    public weak var delegate:AccountDelegate?
+    weak var delegate:AccountDelegate?
     public var accountCreationUser:AccountCreationUser?
     
     // This is to ensure that some error doesn't cause us to attempt to refresh the access token multiple times in a row. I'm assuming that for any one endpoint invocation, we'll at most need to refresh the access token a single time.
@@ -77,8 +77,9 @@ public class GoogleCreds : AccountAPICall, Account {
     
     private var configuration: GoogleCredsConfiguration?
 
-    required public init?(configuration: Any? = nil) {
+    required public init?(configuration: Any? = nil, delegate:AccountDelegate?) {
         super.init()
+        self.delegate = delegate
         guard let configuration = configuration as? GoogleCredsConfiguration else {
             return nil
         }
@@ -101,12 +102,11 @@ public class GoogleCreds : AccountAPICall, Account {
     }
     
     public static func fromProperties(_ properties: AccountProperties, user:AccountCreationUser?, configuration: Any?, delegate:AccountDelegate?) -> Account? {
-        guard let creds = GoogleCreds(configuration: configuration) else {
+        guard let creds = GoogleCreds(configuration: configuration, delegate: delegate) else {
             return nil
         }
         
         creds.accountCreationUser = user
-        creds.delegate = delegate
         creds.accessToken =
             properties.properties[ServerConstants.HTTPOAuth2AccessTokenKey] as? String
         creds.serverAuthCode =
@@ -120,11 +120,10 @@ public class GoogleCreds : AccountAPICall, Account {
             return nil
         }
         
-        guard let result = GoogleCreds(configuration: configuration) else {
+        guard let result = GoogleCreds(configuration: configuration, delegate: delegate) else {
             return nil
         }
         
-        result.delegate = delegate
         result.accountCreationUser = user
         
         // Only owning users have access token's in creds. Sharing users have empty creds stored in the database.

@@ -65,7 +65,7 @@ class GoogleDriveTests: XCTestCase {
     }
 
     func testListFiles() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -102,7 +102,7 @@ class GoogleDriveTests: XCTestCase {
     }
 
     func searchForFolder(name:String, presentExpected:Bool) {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -135,7 +135,7 @@ class GoogleDriveTests: XCTestCase {
 
     func searchForFile(name:String, withMimeType mimeType:String, inFolder folderName:String?, presentExpected:Bool) {
     
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -263,7 +263,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func fullUpload(file: TestFile, mimeType: String, nonStandardFileName: String? = nil) {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -305,7 +305,7 @@ class GoogleDriveTests: XCTestCase {
     func lookupFile(cloudFileName: String, mimeType: MimeType = .text, expectError:Bool = false) -> Bool? {
         var foundResult: Bool?
         
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return nil
         }
@@ -412,7 +412,7 @@ class GoogleDriveTests: XCTestCase {
 */
 
     func testCreateAndDeleteFolder() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -440,7 +440,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func testDeleteFolderThatDoesNotExistFailure() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -466,7 +466,7 @@ class GoogleDriveTests: XCTestCase {
 
         let exp = expectation(description: "\(#function)\(#line)")
 
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -505,7 +505,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func cloudStorageFileDelete(file: TestFile, mimeType: MimeType) {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -552,7 +552,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func testCloudStorageFileDeleteWithRevokedRefreshToken() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -591,7 +591,7 @@ class GoogleDriveTests: XCTestCase {
     }
 
     func testCreateFolderIfDoesNotExist() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -640,7 +640,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func testUploadWithRevokedRefreshToken() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -665,7 +665,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func downloadFile(cloudFileName:String, mimeType: MimeType, expectError:Bool = false, expectedFileNotFound: Bool = false) {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -725,7 +725,7 @@ class GoogleDriveTests: XCTestCase {
     func testDownloadWithRevokedRefreshToken() {
         let cloudFileName = self.knownPresentFile
         
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -755,7 +755,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func testFileDirectDownloadOfNonExistentFileFails() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -789,7 +789,7 @@ class GoogleDriveTests: XCTestCase {
     }
 
     func testThatAccessTokenRefreshOccursWithBadToken() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -819,7 +819,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func testThatAccessTokenRefreshFailsWithBadRefreshToken() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -849,7 +849,7 @@ class GoogleDriveTests: XCTestCase {
     }
 
     func testLookupFileWithRevokedRefreshToken() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -891,7 +891,7 @@ class GoogleDriveTests: XCTestCase {
     }
     
     func testRevokedGoogleRefreshToken() {
-        guard let creds = GoogleCreds(configuration: plist) else {
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
             XCTFail()
             return
         }
@@ -922,7 +922,7 @@ class GoogleDriveTests: XCTestCase {
     func testBadGoogleCredsConfigurationFails() {
         let badConfig = GooglePlist(refreshToken: "unused", GoogleServerClientId: "foo", GoogleServerClientSecret: "bar")
         
-        guard let creds = GoogleCreds(configuration: badConfig) else {
+        guard let creds = GoogleCreds(configuration: badConfig, delegate: nil) else {
             XCTFail()
             return
         }
