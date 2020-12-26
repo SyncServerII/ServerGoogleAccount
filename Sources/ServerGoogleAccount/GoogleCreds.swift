@@ -73,6 +73,7 @@ public class GoogleCreds : AccountAPICall, Account {
     public var accountCreationUser:AccountCreationUser?
     
     // This is to ensure that some error doesn't cause us to attempt to refresh the access token multiple times in a row. I'm assuming that for any one endpoint invocation, we'll at most need to refresh the access token a single time.
+    // I never change this from true back to false because the GoogleCreds will only last, in real server operation, for the duration of an endpoint call (or similar operation). And since those are relatively short-lived an access token will never need refreshing more than once.
     private var alreadyRefreshed = false
     
     private var configuration: GoogleCredsConfiguration?
