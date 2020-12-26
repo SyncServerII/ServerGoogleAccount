@@ -216,7 +216,11 @@ class GoogleDriveTests: XCTestCase {
             cloudFileName = nonStandardFileName
         }
         else {
-            cloudFileName = Filename.inCloud(deviceUUID: deviceUUID, fileUUID: uploadRequest.fileUUID, mimeType: uploadRequest.mimeType, fileVersion: fileVersion)
+            guard let mimeType = uploadRequest.mimeType else {
+                XCTFail()
+                return nil
+            }
+            cloudFileName = Filename.inCloud(deviceUUID: deviceUUID, fileUUID: uploadRequest.fileUUID, mimeType: mimeType, fileVersion: fileVersion)
         }
         
         let exp = expectation(description: "\(#function)\(#line)")
@@ -481,13 +485,7 @@ class GoogleDriveTests: XCTestCase {
                 return
             }
             
-            guard let cloudStorage = creds.cloudStorage else {
-                XCTFail()
-                exp.fulfill()
-                return
-            }
-            
-            cloudStorage.deleteFile(cloudFileName:cloudFileName, options:options) { result in
+            creds.deleteFile(cloudFileName:cloudFileName, options:options) { result in
                 switch result {
                 case .success:
                     break
@@ -569,8 +567,13 @@ class GoogleDriveTests: XCTestCase {
         uploadRequest.checkSum = file.md5CheckSum
         
         let deviceUUID = Foundation.UUID().uuidString
+        
+        guard let mimeType = uploadRequest.mimeType else {
+            XCTFail()
+            return
+        }
 
-        let cloudFileName = Filename.inCloud(deviceUUID: deviceUUID, fileUUID: uploadRequest.fileUUID, mimeType: uploadRequest.mimeType, fileVersion: 0)
+        let cloudFileName = Filename.inCloud(deviceUUID: deviceUUID, fileUUID: uploadRequest.fileUUID, mimeType: mimeType, fileVersion: 0)
 
         let exp = expectation(description: "\(#function)\(#line)")
 
