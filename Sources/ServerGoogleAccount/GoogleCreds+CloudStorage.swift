@@ -668,6 +668,7 @@ extension GoogleCreds : CloudStorage {
                 let reason = errors[0]["reason"] as? String,
                 reason == "notFound" {
                 
+                Log.debug("HTTPStatusCode.notFound: \(dict)")
                 completion(nil, DownloadSmallFileError.fileNotFound)
                 return
             }
