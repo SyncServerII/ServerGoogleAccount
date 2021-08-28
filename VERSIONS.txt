@@ -1,4 +1,7 @@
 ServerGoogleAccount
+
+Version 0.0.3 (8/28/21)
+    Added debugging.
     
 Version 0.0.2 (1/23/21)
     Starting beta testing

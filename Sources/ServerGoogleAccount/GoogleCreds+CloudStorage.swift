@@ -188,6 +188,7 @@ extension GoogleCreds : CloudStorage {
                         break
                         
                     case 1:
+                        Log.debug("searchFor: \(filesArray)")
                         if let fileDict = filesArray[0] as? [String: Any],
                             let id = fileDict["id"] as? String {
                             
