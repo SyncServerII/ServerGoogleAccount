@@ -52,8 +52,8 @@ class GoogleDriveTests: XCTestCase {
     // Folder that will be created and removed.
     let folderCreatedAndDeleted = "abcdefg12345temporary"
     
-    let plist = GooglePlist.load(from: URL(fileURLWithPath: "/Users/chris/Desktop/Apps/SyncServerII/Private/ServerGoogleAccount/token.plist"))
-    let plistRevoked = GooglePlist.load(from: URL(fileURLWithPath: "/Users/chris/Desktop/Apps/SyncServerII/Private/ServerGoogleAccount/tokenRevoked.plist"))
+    let plist = GooglePlist.load(from: URL(fileURLWithPath: "/Users/chris/Developer/Private/ServerGoogleAccount/token.plist"))
+    let plistRevoked = GooglePlist.load(from: URL(fileURLWithPath: "/Users/chris/Developer/Private/ServerGoogleAccount/tokenRevoked.plist"))
     
     override func setUp() {
         super.setUp()
@@ -75,7 +75,7 @@ class GoogleDriveTests: XCTestCase {
         
         creds.refresh { error in
             guard error == nil, creds.accessToken != nil else {
-                XCTFail("Failed to fresh")
+                XCTFail("Failed to fresh: \(String(describing: error))")
                 exp.fulfill()
                 return
             }
@@ -194,6 +194,7 @@ class GoogleDriveTests: XCTestCase {
         searchForFile(name: knownPresentImageFile, withMimeType: "image/png", inFolder: nil, presentExpected: true)
     }
     
+    // On success, returns the uploaded filename
     @discardableResult
     func uploadFile(accountType: AccountScheme.AccountName, creds: CloudStorage, deviceUUID:String, testFile: TestFile, uploadRequest:UploadFileRequest, fileVersion: FileVersionInt, options:CloudStorageFileNameOptions? = nil, nonStandardFileName: String? = nil, failureExpected: Bool = false, errorExpected: CloudStorageError? = nil, expectAccessTokenRevokedOrExpired: Bool = false) -> String? {
     
@@ -207,7 +208,7 @@ class GoogleDriveTests: XCTestCase {
         }
         
         guard fileContentsData != nil else {
-            XCTFail()
+            XCTFail("No fileContentsData")
             return nil
         }
         
@@ -939,6 +940,129 @@ class GoogleDriveTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 10, handler: nil)
+    }
+    
+    // This is in response to an issue arising on 8/28/21
+    func testUploadFileDeleteItThenSearch() {
+        let file = TestFile.test1
+        
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
+            XCTFail()
+            return
+        }
+        
+        creds.refreshToken = plist.refreshToken
+        
+        let exp = expectation(description: "\(#function)\(#line)")
+        
+        creds.refresh { error in
+            XCTAssert(error == nil)
+            XCTAssert(creds.accessToken != nil)
+            exp.fulfill()
+        }
+
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        // Do the upload
+        let deviceUUID = Foundation.UUID().uuidString
+        let fileUUID = Foundation.UUID().uuidString
+        
+        let uploadRequest = UploadFileRequest()
+        uploadRequest.fileUUID = fileUUID
+        uploadRequest.mimeType = file.mimeType.rawValue
+        uploadRequest.sharingGroupUUID = UUID().uuidString
+        uploadRequest.checkSum = file.md5CheckSum
+
+        let options = CloudStorageFileNameOptions(cloudFolderName: self.knownPresentFolder, mimeType: file.mimeType.rawValue)
+        
+        let fileVersion: FileVersionInt = 0
+        
+        guard let cloudFileName = uploadFile(accountType: AccountScheme.google.accountName, creds: creds, deviceUUID: deviceUUID, testFile: file, uploadRequest: uploadRequest, fileVersion: fileVersion, options: options) else {
+            XCTFail()
+            return
+        }
+        
+        let exp2 = expectation(description: "\(#function)\(#line)")
+
+        creds.deleteFile(cloudFileName:cloudFileName, options:options) { result in
+            switch result {
+            case .success:
+                break
+            case .accessTokenRevokedOrExpired:
+                XCTFail()
+            case .failure:
+                XCTFail()
+            }
+            
+            exp2.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        searchForFile(name: cloudFileName, withMimeType: file.mimeType.rawValue, inFolder: self.knownPresentFolder, presentExpected: false)
+    }
+    
+    // This is in response to an issue arising on 8/28/21
+    func testUploadFileDeleteItThenUpload() {
+        let file = TestFile.test1
+        
+        guard let creds = GoogleCreds(configuration: plist, delegate: nil) else {
+            XCTFail()
+            return
+        }
+        
+        creds.refreshToken = plist.refreshToken
+        
+        let exp = expectation(description: "\(#function)\(#line)")
+        
+        creds.refresh { error in
+            XCTAssert(error == nil)
+            XCTAssert(creds.accessToken != nil)
+            exp.fulfill()
+        }
+
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        // Do the upload
+        let deviceUUID = Foundation.UUID().uuidString
+        let fileUUID = Foundation.UUID().uuidString
+        
+        let uploadRequest = UploadFileRequest()
+        uploadRequest.fileUUID = fileUUID
+        uploadRequest.mimeType = file.mimeType.rawValue
+        uploadRequest.sharingGroupUUID = UUID().uuidString
+        uploadRequest.checkSum = file.md5CheckSum
+
+        let options = CloudStorageFileNameOptions(cloudFolderName: self.knownPresentFolder, mimeType: file.mimeType.rawValue)
+        
+        let fileVersion: FileVersionInt = 0
+        
+        guard let cloudFileName = uploadFile(accountType: AccountScheme.google.accountName, creds: creds, deviceUUID: deviceUUID, testFile: file, uploadRequest: uploadRequest, fileVersion: fileVersion, options: options) else {
+            XCTFail()
+            return
+        }
+        
+        let exp2 = expectation(description: "\(#function)\(#line)")
+
+        creds.deleteFile(cloudFileName:cloudFileName, options:options) { result in
+            switch result {
+            case .success:
+                break
+            case .accessTokenRevokedOrExpired:
+                XCTFail()
+            case .failure:
+                XCTFail()
+            }
+            
+            exp2.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        guard let _ = uploadFile(accountType: AccountScheme.google.accountName, creds: creds, deviceUUID: deviceUUID, testFile: file, uploadRequest: uploadRequest, fileVersion: fileVersion, options: options, nonStandardFileName: cloudFileName) else {
+            XCTFail()
+            return
+        }
     }
 }
 

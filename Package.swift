@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -19,6 +19,10 @@ let package = Package(
             dependencies: ["ServerAccount"]),
         .testTarget(
             name: "ServerGoogleAccountTests",
-            dependencies: ["ServerGoogleAccount"]),
+            dependencies: ["ServerGoogleAccount"],
+            resources: [
+                .copy("Cat.jpg"),
+                .copy("example.url"),
+            ]),
     ]
 )
